@@ -63,7 +63,7 @@ Attributes will be injected in log payload.
 ```go
 import (
 	"log/syslog"
-	slogsyslog "github.com/samber/slog-logtsash"
+	slogsyslog "github.com/samber/slog-syslog"
 	"golang.org/x/exp/slog"
 )
 

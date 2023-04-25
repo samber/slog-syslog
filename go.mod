@@ -1,4 +1,4 @@
-module github.com/samber/slog-logtsash
+module github.com/samber/slog-syslog
 
 go 1.20
 
