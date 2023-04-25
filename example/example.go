@@ -6,7 +6,7 @@ import (
 	"log/syslog"
 	"time"
 
-	slogsyslog "github.com/samber/slog-logtsash"
+	slogsyslog "github.com/samber/slog-syslog"
 	"golang.org/x/exp/slog"
 )
 
