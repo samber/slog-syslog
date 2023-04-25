@@ -19,10 +19,11 @@ func DefaultConverter(loggerAttr []slog.Attr, record *slog.Record) map[string]an
 
 	extra := attrsToValue(loggerAttr)
 
-	record.Attrs(func(attr slog.Attr) {
+	record.Attrs(func(attr slog.Attr) bool {
 		for k, v := range attrsToValue([]slog.Attr{attr}) {
 			extra[k] = v
 		}
+		return true
 	})
 
 	if err, ok := extra["error"]; ok {
