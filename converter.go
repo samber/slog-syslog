@@ -78,7 +78,7 @@ func attrToValue(attr slog.Attr) (string, any) {
 	case slog.KindDuration:
 		return k, v.Duration()
 	case slog.KindTime:
-		return k, v.Time()
+		return k, v.Time().UTC()
 	default:
 		return k, anyValueToString(v)
 	}
