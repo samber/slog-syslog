@@ -72,14 +72,14 @@ Attributes will be injected in log payload.
 
 ```go
 import (
-	"log/syslog"
+	"net"
 	slogsyslog "github.com/samber/slog-syslog"
 	"golang.org/x/exp/slog"
 )
 
 func main() {
 	// ncat -u -l 9999 -k
-	writer, err := syslog.Dial("udp", "localhost:9999", syslog.LOG_DEBUG, "demo-syslog-handler")
+	writer, err := net.Dial("udp", "localhost:9999")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -112,39 +112,10 @@ func main() {
 Output:
 
 ```json
-{
-    "timestamp":"2023-04-10T14:00:0.000000",
-    "level":"ERROR",
-    "message":"caramba!",
-    "error":{
-        "error":"could not count users",
-        "kind":"*errors.errorString",
-        "stack":null
-    },
-    "extra":{
-        "environment":"dev",
-        "release":"v1.0.0",
-        "category":"sql",
-        "query.statement":"SELECT COUNT(*) FROM users;",
-        "query.duration": "1s"
-    }
-}
+@cee: {"timestamp":"2023-04-10T14:00:0.000000", "level":"ERROR", "message":"caramba!", "error":{ "error":"could not count users", "kind":"*errors.errorString", "stack":null }, "extra":{ "environment":"dev", "release":"v1.0.0", "category":"sql", "query.statement":"SELECT COUNT(*) FROM users;", "query.duration": "1s" }}
 
 
-{
-    "timestamp":"2023-04-10T14:00:0.000000",
-    "level":"INFO",
-    "message":"user registration",
-    "error":null,
-    "extra":{
-        "environment":"dev",
-        "release":"v1.0.0",
-        "user":{
-            "id":"user-123",
-            "created_at":"2023-04-10T14:00:0.000000+00:00"
-        }
-    }
-}
+@cee: {"timestamp":"2023-04-10T14:00:0.000000", "level":"INFO", "message":"user registration", "error":null, "extra":{ "environment":"dev", "release":"v1.0.0", "user":{ "id":"user-123", "created_at":"2023-04-10T14:00:0.000000+00:00"}}}
 ```
 
 ## 🤝 Contributing

@@ -3,18 +3,19 @@ package slogsyslog
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"log/syslog"
+	"io"
 
 	"golang.org/x/exp/slog"
 )
+
+const ceePrefix = "@cee: "
 
 type Option struct {
 	// log level (default: debug)
 	Level slog.Leveler
 
 	// connection to syslog server
-	Writer *syslog.Writer
+	Writer io.Writer
 
 	// optional: customize json payload builder
 	Converter Converter
@@ -59,18 +60,8 @@ func (h *SyslogHandler) Handle(ctx context.Context, record slog.Record) error {
 		return err
 	}
 
-	switch record.Level {
-	case slog.LevelDebug:
-		return h.option.Writer.Debug(string(bytes))
-	case slog.LevelInfo:
-		return h.option.Writer.Info(string(bytes))
-	case slog.LevelWarn:
-		return h.option.Writer.Warning(string(bytes))
-	case slog.LevelError:
-		return h.option.Writer.Err(string(bytes))
-	}
-
-	return fmt.Errorf("slog-syslog: unexpected log level")
+	_, err = h.option.Writer.Write(append([]byte(ceePrefix), bytes...))
+	return err
 }
 
 func (h *SyslogHandler) WithAttrs(attrs []slog.Attr) slog.Handler {

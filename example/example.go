@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
-	"log/syslog"
+	"net"
 	"time"
 
 	slogsyslog "github.com/samber/slog-syslog"
@@ -12,7 +12,7 @@ import (
 
 func main() {
 	// ncat -u -l 9999 -k
-	writer, err := syslog.Dial("udp", "localhost:9999", syslog.LOG_DEBUG, "demo-syslog-handler")
+	writer, err := net.Dial("udp", "localhost:9999")
 	if err != nil {
 		log.Fatal(err)
 	}
