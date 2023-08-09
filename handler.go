@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"io"
 
-	"golang.org/x/exp/slog"
+	"log/slog"
 )
 
 const ceePrefix = "@cee: "

@@ -6,8 +6,9 @@ import (
 	"net"
 	"time"
 
+	"log/slog"
+
 	slogsyslog "github.com/samber/slog-syslog"
-	"golang.org/x/exp/slog"
 )
 
 func main() {

@@ -2,7 +2,7 @@
 # slog: Syslog handler
 
 [![tag](https://img.shields.io/github/tag/samber/slog-syslog.svg)](https://github.com/samber/slog-syslog/releases)
-![Go Version](https://img.shields.io/badge/Go-%3E%3D%201.20.3-%23007d9c)
+![Go Version](https://img.shields.io/badge/Go-%3E%3D%201.21-%23007d9c)
 [![GoDoc](https://godoc.org/github.com/samber/slog-syslog?status.svg)](https://pkg.go.dev/github.com/samber/slog-syslog)
 ![Build Status](https://github.com/samber/slog-syslog/actions/workflows/test.yml/badge.svg)
 [![Go report](https://goreportcard.com/badge/github.com/samber/slog-syslog)](https://goreportcard.com/report/github.com/samber/slog-syslog)
@@ -10,7 +10,7 @@
 [![Contributors](https://img.shields.io/github/contributors/samber/slog-syslog)](https://github.com/samber/slog-syslog/graphs/contributors)
 [![License](https://img.shields.io/github/license/samber/slog-syslog)](./LICENSE)
 
-A Syslog Handler for [slog](https://pkg.go.dev/golang.org/x/exp/slog) Go library.
+A Syslog Handler for [slog](https://pkg.go.dev/log/slog) Go library.
 
 **See also:**
 
@@ -41,11 +41,9 @@ A Syslog Handler for [slog](https://pkg.go.dev/golang.org/x/exp/slog) Go library
 go get github.com/samber/slog-syslog
 ```
 
-**Compatibility**: go >= 1.20.3
+**Compatibility**: go >= 1.21
 
-This library is v0 and follows SemVer strictly. On `slog` final release (go 1.21), this library will go v1.
-
-No breaking changes will be made to exported APIs before v1.0.0.
+No breaking changes will be made to exported APIs before v2.0.0.
 
 ## 💡 Usage
 
@@ -74,7 +72,7 @@ Attributes will be injected in log payload.
 import (
 	"net"
 	slogsyslog "github.com/samber/slog-syslog"
-	"golang.org/x/exp/slog"
+	"log/slog"
 )
 
 func main() {
