@@ -70,9 +70,13 @@ Attributes will be injected in log payload.
 
 ```go
 import (
-	"net"
-	slogsyslog "github.com/samber/slog-syslog"
+	"fmt"
+	"log"
 	"log/slog"
+	"net"
+	"time"
+
+	slogsyslog "github.com/samber/slog-syslog"
 )
 
 func main() {
