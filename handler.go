@@ -37,6 +37,8 @@ func (o Option) NewSyslogHandler() slog.Handler {
 	}
 }
 
+var _ slog.Handler = (*SyslogHandler)(nil)
+
 type SyslogHandler struct {
 	option Option
 	attrs  []slog.Attr
