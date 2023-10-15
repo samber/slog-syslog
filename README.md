@@ -65,10 +65,22 @@ type Option struct {
 
 	// optional: customize json payload builder
 	Converter Converter
+
+	// optional: see slog.HandlerOptions
+	AddSource   bool
+	ReplaceAttr func(groups []string, a slog.Attr) slog.Attr
 }
 ```
 
 Attributes will be injected in log payload.
+
+Other global parameters:
+
+```go
+slogsyslog.SourceKey = "source"
+slogsyslog.ContextKey = "extra"
+slogsyslog.ErrorKeys = []string{"error", "err"}
+```
 
 ### Example
 
