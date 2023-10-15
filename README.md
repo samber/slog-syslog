@@ -103,27 +103,27 @@ func main() {
 	}
 
 	logger := slog.New(slogsyslog.Option{Level: slog.LevelDebug, Writer: writer}.NewSyslogHandler())
-    logger = logger.
-        With("environment", "dev").
-        With("release", "v1.0.0")
+	logger = logger.
+		With("environment", "dev").
+		With("release", "v1.0.0")
 
-    // log error
-    logger.
-        With("category", "sql").
-        With("query.statement", "SELECT COUNT(*) FROM users;").
-        With("query.duration", 1*time.Second).
-        With("error", fmt.Errorf("could not count users")).
-        Error("caramba!")
+	// log error
+	logger.
+		With("category", "sql").
+		With("query.statement", "SELECT COUNT(*) FROM users;").
+		With("query.duration", 1*time.Second).
+		With("error", fmt.Errorf("could not count users")).
+		Error("caramba!")
 
-    // log user signup
-    logger.
-        With(
-            slog.Group("user",
-                slog.String("id", "user-123"),
-                slog.Time("created_at", time.Now()),
-            ),
-        ).
-        Info("user registration")
+	// log user signup
+	logger.
+		With(
+			slog.Group("user",
+				slog.String("id", "user-123"),
+				slog.Time("created_at", time.Now()),
+			),
+		).
+		Info("user registration")
 }
 ```
 
@@ -131,7 +131,6 @@ Output:
 
 ```json
 @cee: {"timestamp":"2023-04-10T14:00:0.000000", "level":"ERROR", "message":"caramba!", "error":{ "error":"could not count users", "kind":"*errors.errorString", "stack":null }, "extra":{ "environment":"dev", "release":"v1.0.0", "category":"sql", "query.statement":"SELECT COUNT(*) FROM users;", "query.duration": "1s" }}
-
 
 @cee: {"timestamp":"2023-04-10T14:00:0.000000", "level":"INFO", "message":"user registration", "error":null, "extra":{ "environment":"dev", "release":"v1.0.0", "user":{ "id":"user-123", "created_at":"2023-04-10T14:00:0.000000+00:00"}}}
 ```
