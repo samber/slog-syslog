@@ -8,7 +8,7 @@ import (
 
 	"log/slog"
 
-	slogsyslog "github.com/samber/slog-syslog"
+	slogsyslog "github.com/samber/slog-syslog/v2"
 )
 
 func main() {

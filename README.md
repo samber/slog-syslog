@@ -43,16 +43,16 @@ A Syslog Handler for [slog](https://pkg.go.dev/log/slog) Go library.
 ## 🚀 Install
 
 ```sh
-go get github.com/samber/slog-syslog
+go get github.com/samber/slog-syslog/v2
 ```
 
 **Compatibility**: go >= 1.21
 
-No breaking changes will be made to exported APIs before v2.0.0.
+No breaking changes will be made to exported APIs before v3.0.0.
 
 ## 💡 Usage
 
-GoDoc: [https://pkg.go.dev/github.com/samber/slog-syslog](https://pkg.go.dev/github.com/samber/slog-syslog)
+GoDoc: [https://pkg.go.dev/github.com/samber/slog-syslog/v2](https://pkg.go.dev/github.com/samber/slog-syslog/v2)
 
 ### Handler options
 
@@ -93,7 +93,7 @@ import (
 	"net"
 	"time"
 
-	slogsyslog "github.com/samber/slog-syslog"
+	slogsyslog "github.com/samber/slog-syslog/v2"
 )
 
 func main() {
