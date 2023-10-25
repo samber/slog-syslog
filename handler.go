@@ -68,8 +68,11 @@ func (h *SyslogHandler) Handle(ctx context.Context, record slog.Record) error {
 		return err
 	}
 
-	_, err = h.option.Writer.Write(append([]byte(ceePrefix), bytes...))
-	return err
+	go func() {
+		_, _ = h.option.Writer.Write(append([]byte(ceePrefix), bytes...))
+	}()
+
+	return nil
 }
 
 func (h *SyslogHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
