@@ -3,7 +3,7 @@ module github.com/samber/slog-syslog/v2
 go 1.21
 
 require (
-	github.com/samber/slog-common v0.11.0
+	github.com/samber/slog-common v0.14.0
 	go.uber.org/goleak v1.2.1
 )
 
