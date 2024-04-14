@@ -1,4 +1,4 @@
 package slogsyslog
 
 const name = "samber/slog-syslog"
-const version = "VERSION" // replaced by .github/workflows/release.yml
+const version = "v2.2.1" // replaced by .github/workflows/release.yml
