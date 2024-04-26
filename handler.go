@@ -23,6 +23,8 @@ type Option struct {
 	Converter Converter
 	// optional: custom marshaler
 	Marshaler func(v any) ([]byte, error)
+	// optional: fetch attributes from context
+	AttrFromContext []func(ctx context.Context) []slog.Attr
 
 	// optional: see slog.HandlerOptions
 	AddSource   bool
@@ -46,6 +48,10 @@ func (o Option) NewSyslogHandler() slog.Handler {
 		o.Marshaler = json.Marshal
 	}
 
+	if o.AttrFromContext == nil {
+		o.AttrFromContext = []func(ctx context.Context) []slog.Attr{}
+	}
+
 	return &SyslogHandler{
 		option: o,
 		attrs:  []slog.Attr{},
@@ -66,7 +72,8 @@ func (h *SyslogHandler) Enabled(_ context.Context, level slog.Level) bool {
 }
 
 func (h *SyslogHandler) Handle(ctx context.Context, record slog.Record) error {
-	message := h.option.Converter(h.option.AddSource, h.option.ReplaceAttr, h.attrs, h.groups, &record)
+	fromContext := slogcommon.ContextExtractor(ctx, h.option.AttrFromContext)
+	message := h.option.Converter(h.option.AddSource, h.option.ReplaceAttr, append(h.attrs, fromContext...), h.groups, &record)
 
 	bytes, err := h.option.Marshaler(message)
 	if err != nil {

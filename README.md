@@ -81,6 +81,8 @@ type Option struct {
 	Converter Converter
 	// optional: custom marshaler
 	Marshaler func(v any) ([]byte, error)
+	// optional: fetch attributes from context
+	AttrFromContext []func(ctx context.Context) []slog.Attr
 
 	// optional: see slog.HandlerOptions
 	AddSource   bool
@@ -149,6 +151,41 @@ Output:
 @cee: {"timestamp":"2023-04-10T14:00:0.000000", "level":"ERROR", "message":"caramba!", "error":{ "error":"could not count users", "kind":"*errors.errorString", "stack":null }, "extra":{ "environment":"dev", "release":"v1.0.0", "category":"sql", "query.statement":"SELECT COUNT(*) FROM users;", "query.duration": "1s" }}
 
 @cee: {"timestamp":"2023-04-10T14:00:0.000000", "level":"INFO", "message":"user registration", "error":null, "extra":{ "environment":"dev", "release":"v1.0.0", "user":{ "id":"user-123", "created_at":"2023-04-10T14:00:0.000000+00:00"}}}
+```
+
+### Tracing
+
+Import the samber/slog-otel library.
+
+```go
+import (
+	slogsyslog "github.com/samber/slog-syslog"
+	slogotel "github.com/samber/slog-otel"
+	"go.opentelemetry.io/otel/sdk/trace"
+)
+
+func main() {
+	tp := trace.NewTracerProvider(
+		trace.WithSampler(trace.AlwaysSample()),
+	)
+	tracer := tp.Tracer("hello/world")
+
+	ctx, span := tracer.Start(context.Background(), "foo")
+	defer span.End()
+
+	span.AddEvent("bar")
+
+	logger := slog.New(
+		slogsyslog.Option{
+			// ...
+			AttrFromContext: []func(ctx context.Context) []slog.Attr{
+				slogotel.ExtractOtelAttrFromContext([]string{"tracing"}, "trace_id", "span_id"),
+			},
+		}.NewSyslogHandler(),
+	)
+
+	logger.ErrorContext(ctx, "a message")
+}
 ```
 
 ## 🤝 Contributing
