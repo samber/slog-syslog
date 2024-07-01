@@ -80,6 +80,7 @@ func (h *SyslogHandler) Handle(ctx context.Context, record slog.Record) error {
 		return err
 	}
 
+	// non-blocking
 	go func() {
 		_, _ = h.option.Writer.Write(append([]byte(ceePrefix), bytes...))
 	}()
