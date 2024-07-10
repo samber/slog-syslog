@@ -97,6 +97,10 @@ func (h *SyslogHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 }
 
 func (h *SyslogHandler) WithGroup(name string) slog.Handler {
+	if name == "" {
+		return h
+	}
+
 	return &SyslogHandler{
 		option: h.option,
 		attrs:  h.attrs,
