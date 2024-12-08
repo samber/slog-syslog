@@ -1,4 +1,4 @@
-module github.com/samber/slog-syslog/v2
+module github.com/axon-expert/slog-syslog-rfc5424
 
 go 1.21
 
