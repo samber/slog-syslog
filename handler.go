@@ -51,9 +51,9 @@ func (o Option) NewSyslogHandler() slog.Handler {
 var _ slog.Handler = (*SyslogHandler)(nil)
 
 type SyslogHandler struct {
-	option Option
 	attrs  []slog.Attr
 	groups []string
+	option Option
 }
 
 func (h *SyslogHandler) Enabled(_ context.Context, level slog.Level) bool {
