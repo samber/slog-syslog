@@ -2,7 +2,6 @@ package slogsyslog
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log/slog"
@@ -34,7 +33,7 @@ func (o Option) NewSyslogHandler() slog.Handler {
 	}
 
 	if o.Marshaler == nil {
-		o.Marshaler = json.Marshal
+		o.Marshaler = marshalBinary
 	}
 
 	if o.AttrFromContext == nil {
@@ -63,8 +62,7 @@ func (h *SyslogHandler) Enabled(_ context.Context, level slog.Level) bool {
 func (h *SyslogHandler) Handle(ctx context.Context, record slog.Record) error {
 	fromContext := slogcommon.ContextExtractor(ctx, h.option.AttrFromContext)
 	message := h.option.Converter(h.option.AddSource, h.option.ReplaceAttr, append(h.attrs, fromContext...), h.groups, &record)
-
-	bytes, err := message.MarshalBinary()
+	bytes, err := h.option.Marshaler(message)
 	if err != nil {
 		bytes = []byte{}
 	}
