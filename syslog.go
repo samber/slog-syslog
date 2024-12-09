@@ -10,7 +10,6 @@ import (
 type Priority int
 
 const rfc3339Micro = "2006-01-02T15:04:05.999999Z07:00"
-const allowLongSdNames = true
 
 const (
 	Emergency Priority = iota
