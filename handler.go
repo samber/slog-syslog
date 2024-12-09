@@ -5,31 +5,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-
 	"log/slog"
 
 	slogcommon "github.com/samber/slog-common"
 )
 
-const ceePrefix = "@cee: "
-
 type Option struct {
-	// log level (default: debug)
-	Level slog.Leveler
-
-	// connection to syslog server
-	Writer io.Writer
-
-	// optional: customize json payload builder
-	Converter Converter
-	// optional: custom marshaler
-	Marshaler func(v any) ([]byte, error)
-	// optional: fetch attributes from context
+	Level           slog.Leveler
+	Writer          io.Writer
+	Converter       Converter
+	Marshaler       func(v any) ([]byte, error)
+	ReplaceAttr     func(groups []string, a slog.Attr) slog.Attr
 	AttrFromContext []func(ctx context.Context) []slog.Attr
-
-	// optional: see slog.HandlerOptions
-	AddSource   bool
-	ReplaceAttr func(groups []string, a slog.Attr) slog.Attr
+	AddSource       bool
 }
 
 func (o Option) NewSyslogHandler() slog.Handler {

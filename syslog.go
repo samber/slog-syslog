@@ -24,7 +24,6 @@ const (
 )
 
 type Message struct {
-	Priority       Priority
 	Timestamp      time.Time
 	Hostname       string
 	AppName        string
@@ -32,6 +31,7 @@ type Message struct {
 	MessageID      string
 	StructuredData []StructuredData
 	Message        []byte
+	Priority       Priority
 }
 
 func (m *Message) AddStructureData(ID string, Name string, Value string) {
@@ -145,4 +145,3 @@ func escapeSDParam(s string) string {
 	}
 	return string(t)
 }
-
