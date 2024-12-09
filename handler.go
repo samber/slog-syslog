@@ -3,32 +3,21 @@ package slogsyslog
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
-
 	"log/slog"
 
 	slogcommon "github.com/samber/slog-common"
 )
 
-const ceePrefix = "@cee: "
-
 type Option struct {
-	// log level (default: debug)
-	Level slog.Leveler
-
-	// connection to syslog server
-	Writer io.Writer
-
-	// optional: customize json payload builder
-	Converter Converter
-	// optional: custom marshaler
-	Marshaler func(v any) ([]byte, error)
-	// optional: fetch attributes from context
+	Level           slog.Leveler
+	Writer          io.Writer
+	Converter       Converter
+	Marshaler       func(v any) ([]byte, error)
+	ReplaceAttr     func(groups []string, a slog.Attr) slog.Attr
 	AttrFromContext []func(ctx context.Context) []slog.Attr
-
-	// optional: see slog.HandlerOptions
-	AddSource   bool
-	ReplaceAttr func(groups []string, a slog.Attr) slog.Attr
+	AddSource       bool
 }
 
 func (o Option) NewSyslogHandler() slog.Handler {
@@ -75,14 +64,13 @@ func (h *SyslogHandler) Handle(ctx context.Context, record slog.Record) error {
 	fromContext := slogcommon.ContextExtractor(ctx, h.option.AttrFromContext)
 	message := h.option.Converter(h.option.AddSource, h.option.ReplaceAttr, append(h.attrs, fromContext...), h.groups, &record)
 
-	bytes, err := h.option.Marshaler(message)
+	bytes, err := message.MarshalBinary()
 	if err != nil {
-		return err
+		bytes = []byte{}
 	}
-
 	// non-blocking
 	go func() {
-		_, _ = h.option.Writer.Write(append([]byte(ceePrefix), bytes...))
+		_, _ = fmt.Fprintf(h.option.Writer, "%d %s", len(bytes), bytes)
 	}()
 
 	return nil

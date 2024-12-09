@@ -2,21 +2,21 @@ package slogsyslog
 
 import (
 	"log/slog"
+	"os"
+	"strconv"
 
+	"github.com/google/uuid"
 	slogcommon "github.com/samber/slog-common"
 )
 
 var SourceKey = "source"
-var ContextKey = "extra"
 var ErrorKeys = []string{"error", "err"}
 
-type Converter func(addSource bool, replaceAttr func(groups []string, a slog.Attr) slog.Attr, loggerAttr []slog.Attr, groups []string, record *slog.Record) map[string]any
+type Converter func(addSource bool, replaceAttr func(groups []string, a slog.Attr) slog.Attr, loggerAttr []slog.Attr, groups []string, record *slog.Record) Message
 
-func DefaultConverter(addSource bool, replaceAttr func(groups []string, a slog.Attr) slog.Attr, loggerAttr []slog.Attr, groups []string, record *slog.Record) map[string]any {
-	// aggregate all attributes
+func DefaultConverter(addSource bool, replaceAttr func(groups []string, a slog.Attr) slog.Attr, loggerAttr []slog.Attr, groups []string, record *slog.Record) Message {
 	attrs := slogcommon.AppendRecordAttrsToAttrs(loggerAttr, groups, record)
 
-	// developer formatters
 	attrs = slogcommon.ReplaceError(attrs, ErrorKeys...)
 	if addSource {
 		attrs = append(attrs, slogcommon.Source(SourceKey, record))
@@ -24,18 +24,19 @@ func DefaultConverter(addSource bool, replaceAttr func(groups []string, a slog.A
 	attrs = slogcommon.ReplaceAttrs(replaceAttr, []string{}, attrs...)
 	attrs = slogcommon.RemoveEmptyAttrs(attrs)
 
-	// handler formatter
-	log := map[string]any{
-		"logger.name":    name,
-		"logger.version": version,
-		"timestamp":      record.Time.UTC(),
-		"level":          record.Level.String(),
-		"message":        record.Message,
+	message := Message{
+		AppName:   "appName",
+		Hostname:  "hostName",
+		Priority:  ConvertSlogToSyslogSeverity(record.Level),
+		Timestamp: record.Time.UTC(),
+		MessageID: uuid.New().String(),
+		Message:   []byte(record.Message),
+		ProcessID: strconv.Itoa(os.Getpid()),
 	}
 
-	extra := slogcommon.AttrsToMap(attrs...)
+	for _, attr := range attrs {
+		message.AddStructureData("ID", attr.Key, attr.Value.String())
+	}
 
-	log[ContextKey] = extra
-
-	return log
+	return message
 }
