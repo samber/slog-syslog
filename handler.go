@@ -74,17 +74,15 @@ func (h *SyslogHandler) Enabled(_ context.Context, level slog.Level) bool {
 
 func (h *SyslogHandler) Handle(ctx context.Context, record slog.Record) error {
 	fromContext := slogcommon.ContextExtractor(ctx, h.option.AttrFromContext)
-	bytes := h.option.Converter(h.option.AddSource, h.option.ReplaceAttr, append(h.attrs, fromContext...), h.groups, &record)
+	message := h.option.Converter(h.option.AddSource, h.option.ReplaceAttr, append(h.attrs, fromContext...), h.groups, &record)
 
-	// bytes, err := h.option.Marshaler(message)
-	// if err != nil {
-	// 	return err
-	// }
-
+	bytes, err := message.MarshalBinary()
+	if err != nil {
+		bytes = []byte{}
+	}
 	// non-blocking
 	go func() {
 		_, _ = fmt.Fprintf(h.option.Writer, "%d %s", len(bytes), bytes)
-		// _, _ = h.option.Writer.Write(bytes)
 	}()
 
 	return nil
