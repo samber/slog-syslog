@@ -12,9 +12,9 @@ import (
 var SourceKey = "source"
 var ErrorKeys = []string{"error", "err"}
 
-type Converter func(addSource bool, replaceAttr func(groups []string, a slog.Attr) slog.Attr, loggerAttr []slog.Attr, groups []string, record *slog.Record) Message
+type Converter func(addSource bool, replaceAttr func(groups []string, a slog.Attr) slog.Attr, loggerAttr []slog.Attr, groups []string, record *slog.Record) []byte
 
-func DefaultConverter(addSource bool, replaceAttr func(groups []string, a slog.Attr) slog.Attr, loggerAttr []slog.Attr, groups []string, record *slog.Record) Message {
+func DefaultConverter(addSource bool, replaceAttr func(groups []string, a slog.Attr) slog.Attr, loggerAttr []slog.Attr, groups []string, record *slog.Record) []byte {
 	attrs := slogcommon.AppendRecordAttrsToAttrs(loggerAttr, groups, record)
 
 	attrs = slogcommon.ReplaceError(attrs, ErrorKeys...)
@@ -30,7 +30,7 @@ func DefaultConverter(addSource bool, replaceAttr func(groups []string, a slog.A
 		Priority:  ConvertSlogToSyslogSeverity(record.Level),
 		Timestamp: record.Time.UTC(),
 		MessageID: uuid.New().String(),
-		Message:   record.Message,
+		Message:   []byte(record.Message),
 		ProcessID: strconv.Itoa(os.Getpid()),
 	}
 
@@ -38,5 +38,9 @@ func DefaultConverter(addSource bool, replaceAttr func(groups []string, a slog.A
 		message.AddStructureData("ID", attr.Key, attr.Value.String())
 	}
 
-	return message
+	b, err := message.MarshalBinary()
+	if err != nil {
+		return []byte{}
+	}
+	return b
 }

@@ -1,11 +1,16 @@
 package slogsyslog
 
 import (
+	"bytes"
+	"fmt"
 	"log/slog"
 	"time"
 )
 
 type Priority int
+
+const rfc3339Micro = "2006-01-02T15:04:05.999999Z07:00"
+const allowLongSdNames = true
 
 const (
 	Emergency Priority = iota
@@ -19,14 +24,14 @@ const (
 )
 
 type Message struct {
-	Priority       Priority         `json:"priority"`
-	Timestamp      time.Time        `json:"timestamp"`
-	Hostname       string           `json:"hostname"`
-	AppName        string           `json:"appname"`
-	ProcessID      string           `json:"process_id"`
-	MessageID      string           `json:"message_id"`
-	StructuredData []StructuredData `json:"structured_data"`
-	Message        string           `json:"message"`
+	Priority       Priority
+	Timestamp      time.Time
+	Hostname       string
+	AppName        string
+	ProcessID      string
+	MessageID      string
+	StructuredData []StructuredData
+	Message        []byte
 }
 
 func (m *Message) AddStructureData(ID string, Name string, Value string) {
@@ -50,6 +55,35 @@ func (m *Message) AddStructureData(ID string, Name string, Value string) {
 			},
 		},
 	})
+}
+
+func (m *Message) MarshalBinary() ([]byte, error) {
+	b := bytes.NewBuffer(nil)
+	fmt.Fprintf(b, "<%d>1 %s %s %s %s %s ",
+		m.Priority,
+		m.Timestamp.Format(rfc3339Micro),
+		nilify(m.Hostname),
+		nilify(m.AppName),
+		nilify(m.ProcessID),
+		nilify(m.MessageID))
+
+	if len(m.StructuredData) == 0 {
+		fmt.Fprint(b, "-")
+	}
+	for _, sdElement := range m.StructuredData {
+		fmt.Fprintf(b, "[%s", sdElement.ID)
+		for _, sdParam := range sdElement.Parameters {
+			fmt.Fprintf(b, " %s=\"%s\"", sdParam.Name,
+				escapeSDParam(sdParam.Value))
+		}
+		fmt.Fprintf(b, "]")
+	}
+
+	if len(m.Message) > 0 {
+		fmt.Fprint(b, " ")
+		b.Write(m.Message)
+	}
+	return b.Bytes(), nil
 }
 
 type SDParam struct {
@@ -76,3 +110,39 @@ func ConvertSlogToSyslogSeverity(lvl slog.Level) Priority {
 
 	return Emergency
 }
+
+func nilify(x string) string {
+	if x == "" {
+		return "-"
+	}
+	return x
+}
+
+func escapeSDParam(s string) string {
+	escapeCount := 0
+	for i := 0; i < len(s); i++ {
+		switch s[i] {
+		case '\\', '"', ']':
+			escapeCount++
+		}
+	}
+	if escapeCount == 0 {
+		return s
+	}
+
+	t := make([]byte, len(s)+escapeCount)
+	j := 0
+	for i := 0; i < len(s); i++ {
+		switch c := s[i]; c {
+		case '\\', '"', ']':
+			t[j] = '\\'
+			t[j+1] = c
+			j += 2
+		default:
+			t[j] = s[i]
+			j++
+		}
+	}
+	return string(t)
+}
+
