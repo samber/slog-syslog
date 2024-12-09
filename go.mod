@@ -1,6 +1,6 @@
 module github.com/axon-expert/slog-syslog-rfc5424
 
-go 1.21
+go 1.23
 
 require github.com/samber/slog-common v0.17.1
 
