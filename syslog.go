@@ -56,30 +56,20 @@ func (m *Message) AddStructureData(ID string, Name string, Value string) {
 	})
 }
 
-func marshalBinary(m any) ([]byte, error) {
-	var obj Message
-
-	if v, ok := m.(Message); ok {
-		obj = v
-	} else {
-		obj = Message{
-			Message: []byte("non correct message"),
-		}
-	}
-
+func marshalBinary(m Message) ([]byte, error) {
 	b := bytes.NewBuffer(nil)
 	fmt.Fprintf(b, "<%d>1 %s %s %s %s %s ",
-		obj.Priority,
-		obj.Timestamp.Format(rfc3339Micro),
-		nilify(obj.Hostname),
-		nilify(obj.AppName),
-		nilify(obj.ProcessID),
-		nilify(obj.MessageID))
+		m.Priority,
+		m.Timestamp.Format(rfc3339Micro),
+		nilify(m.Hostname),
+		nilify(m.AppName),
+		nilify(m.ProcessID),
+		nilify(m.MessageID))
 
-	if len(obj.StructuredData) == 0 {
+	if len(m.StructuredData) == 0 {
 		fmt.Fprint(b, "-")
 	}
-	for _, sdElement := range obj.StructuredData {
+	for _, sdElement := range m.StructuredData {
 		fmt.Fprintf(b, "[%s", sdElement.ID)
 		for _, sdParam := range sdElement.Parameters {
 			fmt.Fprintf(b, " %s=\"%s\"", sdParam.Name,
@@ -88,9 +78,9 @@ func marshalBinary(m any) ([]byte, error) {
 		fmt.Fprintf(b, "]")
 	}
 
-	if len(obj.Message) > 0 {
+	if len(m.Message) > 0 {
 		fmt.Fprint(b, " ")
-		b.Write(obj.Message)
+		b.Write(m.Message)
 	}
 	return b.Bytes(), nil
 }
