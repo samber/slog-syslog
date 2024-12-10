@@ -13,7 +13,7 @@ type Option struct {
 	Level           slog.Leveler
 	Writer          io.Writer
 	Converter       Converter
-	Marshaler       func(v any) ([]byte, error)
+	Marshaler       func(v Message) ([]byte, error)
 	ReplaceAttr     func(groups []string, a slog.Attr) slog.Attr
 	AttrFromContext []func(ctx context.Context) []slog.Attr
 	AddSource       bool
