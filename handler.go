@@ -19,7 +19,7 @@ type Option struct {
 	AddSource       bool
 }
 
-func (o Option) NewSyslogHandler() slog.Handler {
+func (o Option) NewSyslogHandler(appName, hostname string) slog.Handler {
 	if o.Level == nil {
 		o.Level = slog.LevelDebug
 	}
@@ -29,7 +29,7 @@ func (o Option) NewSyslogHandler() slog.Handler {
 	}
 
 	if o.Converter == nil {
-		o.Converter = DefaultConverter
+		o.Converter = DefaultConverter(appName, hostname)
 	}
 
 	if o.Marshaler == nil {
