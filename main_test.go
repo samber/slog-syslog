@@ -29,7 +29,7 @@ func TestHandler(t *testing.T) {
 		Converter: FakeConverter,
 	}
 
-	handler := opt.NewSyslogHandler()
+	handler := opt.NewSyslogHandler("test app", "test hostname")
 	slog.SetDefault(slog.New(handler))
 
 	logMsg := "test"

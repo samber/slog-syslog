@@ -13,12 +13,12 @@ import (
 
 func main() {
 	// ncat -u -l 9999 -k
-	writer, err := net.Dial("udp", "localhost:9999")
+	writer, err := net.Dial("udp", "localhost:514")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	logger := slog.New(slogsyslog.Option{Level: slog.LevelDebug, Writer: writer}.NewSyslogHandler())
+	logger := slog.New(slogsyslog.Option{Level: slog.LevelDebug, Writer: writer}.NewSyslogHandler("test app", "localhost"))
 	logger = logger.With("release", "v1.0.0")
 
 	logger.
@@ -29,6 +29,8 @@ func main() {
 			),
 		).
 		With("environment", "dev").
-		With("error", fmt.Errorf("an error")).
+		With("error", fmt.Errorf("an error").Error()).
 		Error("A message")
+
+	time.Sleep(time.Second * 3)
 }

@@ -14,7 +14,12 @@ var ErrorKeys = []string{"error", "err"}
 
 type Converter func(addSource bool, replaceAttr func(groups []string, a slog.Attr) slog.Attr, loggerAttr []slog.Attr, groups []string, record *slog.Record) Message
 
-func DefaultConverter(addSource bool, replaceAttr func(groups []string, a slog.Attr) slog.Attr, loggerAttr []slog.Attr, groups []string, record *slog.Record) Message {
+func DefaultConverter(appName, hostname string) Converter {
+	return func(addSource bool, replaceAttr func(groups []string, a slog.Attr) slog.Attr, loggerAttr []slog.Attr, groups []string, record *slog.Record) Message {
+		return defaultConverter(appName, hostname, addSource, replaceAttr, loggerAttr, groups, record)
+	}
+}
+func defaultConverter(appName, hostname string, addSource bool, replaceAttr func(groups []string, a slog.Attr) slog.Attr, loggerAttr []slog.Attr, groups []string, record *slog.Record) Message {
 	attrs := slogcommon.AppendRecordAttrsToAttrs(loggerAttr, groups, record)
 
 	attrs = slogcommon.ReplaceError(attrs, ErrorKeys...)
@@ -25,8 +30,8 @@ func DefaultConverter(addSource bool, replaceAttr func(groups []string, a slog.A
 	attrs = slogcommon.RemoveEmptyAttrs(attrs)
 
 	message := Message{
-		AppName:   "appName",
-		Hostname:  "hostName",
+		AppName:   appName,
+		Hostname:  hostname,
 		Priority:  ConvertSlogToSyslogSeverity(record.Level),
 		Timestamp: record.Time.UTC(),
 		MessageID: uuid.New().String(),
