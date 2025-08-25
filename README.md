@@ -92,7 +92,7 @@ type Option struct {
 	Level slog.Leveler
 
 	// connection to syslog server
-	Writer *syslog.Writer
+	Writer io.Writer
 
 	// optional: customize json payload builder
 	Converter Converter
