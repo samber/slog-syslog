@@ -9,7 +9,7 @@ import (
 
 type Priority int
 
-const rfc3339Micro = "2006-01-02T15:04:05.999999Z07:00"
+const layoutMicro = "2006-01-02T15:04:05.000000-07:00"
 
 const (
 	Emergency Priority = iota
@@ -60,7 +60,7 @@ func marshalBinary(m Message) ([]byte, error) {
 	b := bytes.NewBuffer(nil)
 	fmt.Fprintf(b, "<%d>1 %s %s %s %s %s ",
 		m.Priority,
-		m.Timestamp.Format(rfc3339Micro),
+		m.Timestamp.Format(layoutMicro),
 		nilify(m.Hostname),
 		nilify(m.AppName),
 		nilify(m.ProcessID),
