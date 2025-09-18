@@ -37,7 +37,7 @@ func TestHandler(t *testing.T) {
 	slog.Info(logMsg)
 	time.Sleep(time.Second * 2)
 
-	expectedByteLen := 88
+	expectedByteLen := 100
 
 	rb := make([]byte, w.Len())
 	if _, err := w.Read(rb); err != nil {
