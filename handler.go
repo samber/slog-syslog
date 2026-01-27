@@ -3,9 +3,9 @@ package slogsyslog
 import (
 	"context"
 	"encoding/json"
-	"io"
 
 	"log/slog"
+	"log/syslog"
 
 	slogcommon "github.com/samber/slog-common"
 )
@@ -17,7 +17,7 @@ type Option struct {
 	Level slog.Leveler
 
 	// connection to syslog server
-	Writer io.Writer
+	Writer *syslog.Writer
 
 	// optional: customize json payload builder
 	Converter Converter
@@ -82,7 +82,19 @@ func (h *SyslogHandler) Handle(ctx context.Context, record slog.Record) error {
 
 	// non-blocking
 	go func() {
-		_, _ = h.option.Writer.Write(append([]byte(ceePrefix), bytes...))
+		msg := string(append([]byte(ceePrefix), bytes...))
+		switch record.Level {
+		case slog.LevelDebug:
+			h.option.Writer.Debug(msg)
+		case slog.LevelInfo:
+			h.option.Writer.Info(msg)
+		case slog.LevelWarn:
+			h.option.Writer.Warning(msg)
+		case slog.LevelError:
+			h.option.Writer.Err(msg)
+		default:
+			h.option.Writer.Crit(msg)
+		}
 	}()
 
 	return nil
