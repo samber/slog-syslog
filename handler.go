@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"slices"
 
 	"log/slog"
 
@@ -105,6 +106,6 @@ func (h *SyslogHandler) WithGroup(name string) slog.Handler {
 	return &SyslogHandler{
 		option: h.option,
 		attrs:  h.attrs,
-		groups: append(h.groups, name),
+		groups: append(slices.Clip(h.groups), name),
 	}
 }
